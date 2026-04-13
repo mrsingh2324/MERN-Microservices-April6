@@ -1,0 +1,31 @@
+services:
+  auth-service:
+    build: ./auth-service
+    # Port 4000 is hardcoded in your server.js line 29
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_URI="mongodb+srv://satyam:12345@cluster0.mfyt6ui.mongodb.net/user?retryWrites=true&w=majority"
+      - JWT_SECRET=your_secret_key
+
+  books-service:
+    build: ./books-service
+    # Port 5000 is hardcoded in your server.js line 28
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI="mongodb+srv://satyam:12345@cluster0.mfyt6ui.mongodb.net/Book?retryWrites=true&w=majority"
+
+  api-gateway:
+    build: ./api-gateway
+    # Mapping Host 6000 to Container 6000
+    ports:
+      - "6000:6000"
+    environment:
+      - PORT=6000
+      # Using Docker service names for internal communication
+      - AUTH_SERVICE_URL=http://auth-service:4000
+      - BOOKS_SERVICE_URL=http://books-service:5000
+    depends_on:
+      - auth-service
+      - books-service
